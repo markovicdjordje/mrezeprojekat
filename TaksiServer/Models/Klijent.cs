@@ -13,7 +13,7 @@ namespace TaksiServer.Models
         public int KrajnjaX { get; set; }
         public int KrajnjaY { get; set; }
 
-        public StatusKlijenta statusKlijenta {get; set;}
+        public StatusKlijenta StatusKlijenta {get; set;}
 
         public byte[] Serialize()
         {
