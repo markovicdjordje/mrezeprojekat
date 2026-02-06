@@ -23,7 +23,7 @@ namespace TaksiServer.Models
         {
             using (MemoryStream ms = new MemoryStream())
             {
-                var formatter = new BinaryFormatter();
+                BinaryFormatter formatter = new BinaryFormatter();
                 formatter.Serialize(ms, this);
                 return ms.ToArray();
             }
@@ -33,7 +33,7 @@ namespace TaksiServer.Models
         {
             using (MemoryStream ms = new MemoryStream(data))
             {
-                var formatter = new BinaryFormatter();
+                BinaryFormatter formatter = new BinaryFormatter();
                 return (Klijent)formatter.Deserialize(ms);
             }
         }
