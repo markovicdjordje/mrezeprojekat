@@ -40,17 +40,6 @@ namespace TaksiVozila
             // Glavna petlja za UDP zahteve od klijenata
             PrihvatiKlijente();
 
-
-
-
-
-
-
-
-
-
-
-
         }
 
         // TCP - Prihvati povezivanje vozila
@@ -97,7 +86,7 @@ namespace TaksiVozila
                     Console.WriteLine($"[UDP] ✓ Primljen zahtev od klijenta {klijentEndPoint}:");
                     Console.WriteLine($"      {zahtevKlijenta}\n");
 
-                    // Obради zahtev i pošalji vozilu
+                    // Obradi zahtev i pošalji vozilu
                     if (voziloStream != null)
                     {
                         Console.WriteLine("[SERVER] Prosleđujem zadatak vozilu...");
