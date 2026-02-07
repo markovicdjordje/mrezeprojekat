@@ -1,7 +1,0 @@
-C:\Users\HP\source\repos\mrezeprojekat\TaksiKlijent\bin\Debug\TaksiKlijent.exe.config
-C:\Users\HP\source\repos\mrezeprojekat\TaksiKlijent\bin\Debug\TaksiKlijent.exe
-C:\Users\HP\source\repos\mrezeprojekat\TaksiKlijent\bin\Debug\TaksiKlijent.pdb
-C:\Users\HP\source\repos\mrezeprojekat\TaksiKlijent\obj\Debug\TaksiKlijent.csproj.AssemblyReference.cache
-C:\Users\HP\source\repos\mrezeprojekat\TaksiKlijent\obj\Debug\TaksiKlijent.csproj.CoreCompileInputs.cache
-C:\Users\HP\source\repos\mrezeprojekat\TaksiKlijent\obj\Debug\TaksiKlijent.exe
-C:\Users\HP\source\repos\mrezeprojekat\TaksiKlijent\obj\Debug\TaksiKlijent.pdb
