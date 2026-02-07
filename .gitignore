@@ -4,4 +4,5 @@
 
 /.vs
 /TaksiVozila/.vs
-/TaksiVozila/obj
+/**/obj/
+/**/bin/
