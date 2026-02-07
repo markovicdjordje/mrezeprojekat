@@ -87,6 +87,7 @@ namespace TaksiServer
                     string potvrda = "Server: Vozilo registrovano";
                     byte[] potvrdaBytes = Encoding.UTF8.GetBytes(potvrda);
                     stream.Write(potvrdaBytes, 0, potvrdaBytes.Length);
+                    new Thread(() => ObradaVozila(taksiVozilo)).Start();
                 }
                 catch (Exception ex)
                 {
@@ -162,6 +163,40 @@ namespace TaksiServer
                 }
             }
         }
+        static void ObradaVozila(TaksiVozilo vozilo)
+        {
+            byte[] buffer = new byte[1024];
+
+            try
+            {
+                while (true)
+                {
+                    int bytesRead = vozilo.Stream.Read(buffer, 0, buffer.Length);
+                    if (bytesRead == 0) break;
+
+                    string poruka = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+
+                    lock (lockObj)
+                    {
+                        if (poruka == "STIGAO_PO_KLIJENTA")
+                        {
+                            vozilo.StatusVozila = StatusVozila.Voznja;
+                        }
+                        else if (poruka == "VOZNJA_ZAVRSENA")
+                        {
+                            vozilo.StatusVozila = StatusVozila.Slobodno;
+                            vozilo.Zarada += 500;
+                            vozilo.PredjenaKilometraza += 5;
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                Console.WriteLine("[TCP] Vozilo se diskonektovalo.");
+            }
+        }
+
 
         static void VizuelizacijaLoop()
         {

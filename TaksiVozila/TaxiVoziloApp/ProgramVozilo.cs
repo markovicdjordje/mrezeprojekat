@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using TaxiCore.Enums;
 using TaxiCore.Models;
@@ -67,7 +68,29 @@ namespace TaxiVoziloApp
                 Console.WriteLine($"Server: {potvrda}\n");
 
                 Console.WriteLine("Cekam zadatke od servera...\n");
+
                 while (true)
+                {
+                    //bytesRead = stream.Read
+                    if (bytesRead == 0) break;
+
+                    string poruka = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                    Console.WriteLine($"[ZADATAK {poruka}]");
+
+                    Console.WriteLine("->Krecem ka klijentu...");
+                    Thread.Sleep(3000);
+                    Posalji("STIGAO_PO_KLIJENTA");
+
+                    // Simulacija vožnje
+                    Console.WriteLine("→ Vozim klijenta...");
+                    Thread.Sleep(5000);
+                    Posalji("VOZNJA_ZAVRSENA");
+
+                    Console.WriteLine("✓ Vožnja završena\n");
+                }
+
+
+                /*while (true)
                 {
                     bytesRead = stream.Read(buffer, 0, buffer.Length);
                     if (bytesRead > 0)
@@ -75,7 +98,7 @@ namespace TaxiVoziloApp
                         string zadatak = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                         Console.WriteLine($"\nPRIMLJEN ZADATAK: {zadatak}");
                     }
-                }
+                }*/
                
             }
             catch (Exception ex)
@@ -87,6 +110,11 @@ namespace TaxiVoziloApp
                 stream?.Close();
                 tcpClient?.Close();
             }
+        }
+        static void Posalji(string poruka)
+        {
+            byte[] data = Encoding.UTF8.GetBytes(poruka);
+            stream.Write(data, 0, data.Length);
         }
     }
 }
