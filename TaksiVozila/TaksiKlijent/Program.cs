@@ -4,7 +4,9 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
+using TaxiCore.Models;
+using TaxiCore.Enums;
+using System.Security.Cryptography;
 
 namespace TaksiKlijent
 {
@@ -25,29 +27,63 @@ namespace TaksiKlijent
                 IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(SERVER_IP), SERVER_PORT);
 
                 // Unos podataka od korisnika
-                Console.Write("Unesite početnu tačku (npr. Trg Republike): ");
-                string pocetnaTacka = Console.ReadLine();
+                Console.Write("Unesite početne koordinate (X) ");
+                string pocetnaTackaX = Console.ReadLine();
+                int pocetnaX;
+                if ( int.TryParse(pocetnaTackaX, out pocetnaX) == false)
+                {
+                    Console.WriteLine("UNESI BROJ");
+                    return;
+                }
+                
 
-                Console.Write("Unesite krajnju tačku (npr. Aerodrom): ");
-                string krajnjaTacka = Console.ReadLine();
+                Console.Write("Unesite početne koordinate (Y) ");
+                string pocetnaTackaY = Console.ReadLine();
+                int pocetnaY;
+                if (int.TryParse(pocetnaTackaY, out pocetnaY) == false)
+                {
+                    Console.WriteLine("UNESI BROJ");
+                    return;
+                }
+
+                Console.Write("Unesite krajnje koordinate (X) ");
+                string krajnjaTackaX = Console.ReadLine();
+                int krajnjaX;
+                if (int.TryParse(krajnjaTackaX, out krajnjaX) == false)
+                {
+                    Console.WriteLine("UNESI BROJ");
+                    return;
+                }
+
+                Console.Write("Unesite krajnje koordinate (Y) ");
+                string krajnjaTackaY = Console.ReadLine();
+                int krajnjaY;
+                if (int.TryParse(krajnjaTackaY, out krajnjaY) == false)
+                {
+                    Console.WriteLine("UNESI BROJ");
+                    return;
+                }
+
+                Klijent klijent = new Klijent
+                {
+                    PocetneKoordinate = { X = pocetnaX, Y = pocetnaY },
+                    KrajnjeKoordinate = { X = krajnjaX, Y = krajnjaY },
+                    StatusKlijenta = StatusKlijenta.Cekanje
+                };
 
                 // Kreiraj zahtev
-                string zahtev = $"Od: {pocetnaTacka} -> Do: {krajnjaTacka}";
+                string zahtev = $"Od: {pocetnaX}:{pocetnaY} -> Do: {krajnjaX}:{krajnjaY}";
                 byte[] zahtevBytes = Encoding.UTF8.GetBytes(zahtev);
 
                 // Pošalji zahtev serveru preko UDP
                 udpClient.Send(zahtevBytes, zahtevBytes.Length, serverEndPoint);
                 Console.WriteLine("\n✓ Zahtev poslat serveru!\n");
 
-                Console.WriteLine("Čekam odgovor...\n");
-
-                // Primi odgovor od servera
-                IPEndPoint primaocEndPoint = new IPEndPoint(IPAddress.Any, 0);
-                byte[] odgovorBytes = udpClient.Receive(ref primaocEndPoint);
+                IPEndPoint remoteEP = new IPEndPoint(IPAddress.Any, 0);
+                byte[] odgovorBytes = udpClient.Receive(ref remoteEP);
                 string odgovor = Encoding.UTF8.GetString(odgovorBytes);
 
-                Console.WriteLine($"✓ Server odgovorio:");
-                Console.WriteLine($"  {odgovor}\n");
+                Console.WriteLine($"Server odgovara: {odgovor}");
             }
             catch (Exception ex)
             {
