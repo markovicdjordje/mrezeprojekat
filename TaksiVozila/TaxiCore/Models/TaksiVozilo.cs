@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Policy;
 using System.Text;
@@ -14,6 +15,9 @@ namespace TaxiCore.Models
     [Serializable]
     public class TaksiVozilo
     {
+        public TcpClient TcpClient {  get; set; }
+        public NetworkStream Stream { get; set; }
+
         public Koordinate KoordinateVozila {  get; set; }
         public StatusVozila StatusVozila { get; set; }
         public double PredjenaKilometraza { get; set; }

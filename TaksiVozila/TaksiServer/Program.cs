@@ -6,6 +6,8 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using TaxiCore.Models;
+using TaxiCore.Enums;
 
 namespace TaksiServer
 {
@@ -13,13 +15,15 @@ namespace TaksiServer
     {
         private static TcpListener tcpListener;
         private static UdpClient udpClient;
-        private static TcpClient voziloKlijent;
-        private static NetworkStream voziloStream;
 
         private const int TCP_PORT = 5000; // Port za vozila
         private const int UDP_PORT = 5001; // Port za klijente
 
-        private static string statusVozila = null;
+        private static List<TaksiVozilo> TaksiVozila = new List<TaksiVozilo>();
+        private static List<Klijent> Klijenti = new List<Klijent>();
+        private static readonly object lockObj = new object();
+
+        //private static string statusVozila = null;
 
         static void Main(string[] args)
         {
@@ -39,6 +43,9 @@ namespace TaksiServer
             Thread tcpThread = new Thread(PrihvatiVozilo);
             tcpThread.Start();
 
+            Thread visuelizacijaThread = new Thread(VizuelizacijaLoop);
+            visuelizacijaThread.Start();
+
             // Glavna petlja za UDP zahteve od klijenata
             PrihvatiKlijente();
 
@@ -49,27 +56,32 @@ namespace TaksiServer
         {
             try
             {
-                voziloKlijent = tcpListener.AcceptTcpClient();
-                voziloStream = voziloKlijent.GetStream();
-                Console.WriteLine("[TCP] ✓ Vozilo se povezalo!\n");
-
-                // Primi podatke od vozila
+                TcpClient tcpClient = tcpListener.AcceptTcpClient();
+                NetworkStream stream = tcpClient.GetStream();
                 byte[] buffer = new byte[1024];
-                int bytesRead = voziloStream.Read(buffer, 0, buffer.Length);
+                int bytesRead = stream.Read(buffer, 0, buffer.Length);
                 string podaciVozila = Encoding.UTF8.GetString(buffer, 0, bytesRead);
 
-                Console.WriteLine($"[TCP] Primljeni podaci od vozila:");
-                Console.WriteLine($"      {podaciVozila}\n");
+                TaksiVozilo taksiVozilo = new TaksiVozilo
+                {
+                    TcpClient = tcpClient,
+                    Stream = stream,
+                    KoordinateVozila = { X = 0, Y = 0 },
+                    StatusVozila = StatusVozila.Slobodno,
+                    Zarada = 0,
+                    PredjenaKilometraza = 0
+                };
 
-                if (podaciVozila.Contains("slobodan"))
-                    statusVozila = "slobodan";
-                else
-                    statusVozila = "zauzet";
-                
-                // Pošalji potvrdu vozilu
+                lock (lockObj)
+                {
+                    TaksiVozila.Add(taksiVozilo);
+                }
+
+                Console.Write($"[TCP] Novo vozilo se povezalo: {podaciVozila}");
+
                 string potvrda = "Server: Vozilo registrovano";
                 byte[] potvrdaBytes = Encoding.UTF8.GetBytes(potvrda);
-                voziloStream.Write(potvrdaBytes, 0, potvrdaBytes.Length);
+                stream.Write(potvrdaBytes, 0, potvrdaBytes.Length);
             }
             catch (Exception ex)
             {
@@ -80,58 +92,105 @@ namespace TaksiServer
         // UDP - Prihvati zahteve od klijenata
         static void PrihvatiKlijente()
         {
-            try
+            IPEndPoint klijentEP = new IPEndPoint(IPAddress.Any, 0);
+            while (true)
             {
-                while (true)
+                try
                 {
-                    IPEndPoint klijentEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                    byte[] primljeniPodaci = udpClient.Receive(ref klijentEP);
+                    string zahtev = Encoding.UTF8.GetString(primljeniPodaci);
 
-                    // Primi zahtev od klijenta
-                    byte[] primljeniPodaci = udpClient.Receive(ref klijentEndPoint);
-                    string zahtevKlijenta = Encoding.UTF8.GetString(primljeniPodaci);
-
-                    Console.WriteLine($"[UDP] ✓ Primljen zahtev od klijenta {klijentEndPoint}:");
-                    Console.WriteLine($"      {zahtevKlijenta}\n");
-
-
-                    if (voziloStream == null)
+                    Klijent klijent = new Klijent
                     {
-                        string odgovor = "Server: Vozilo još nije povezano, pokušajte kasnije.";
-                        byte[] odgovorBytes = Encoding.UTF8.GetBytes(odgovor);
-                        udpClient.Send(odgovorBytes, odgovorBytes.Length, klijentEndPoint);
-                        Console.WriteLine("[UPOZORENJE] Vozilo još nije povezano.\n");
-                        continue;
+                        PocetneKoordinate = { X = 1, Y = 1 },
+                        KrajnjeKoordinate = { X = 2, Y = 2 },
+                        StatusKlijenta = StatusKlijenta.Cekanje
+                    };
+
+                    lock (lockObj)
+                    {
+                        Klijenti.Add(klijent);
                     }
 
-                    // Obradi zahtev i pošalji vozilu
-                    if (statusVozila == "slobodan")
-                    {
-                        Console.WriteLine("[SERVER] Prosleđujem zadatak vozilu...");
-                        string zadatak = $"NOVI ZADATAK: {zahtevKlijenta}";
-                        byte[] zadatakBytes = Encoding.UTF8.GetBytes(zadatak);
-                        voziloStream.Write(zadatakBytes, 0, zadatakBytes.Length);
-                        Console.WriteLine("[TCP] ✓ Zadatak poslat vozilu!\n");
+                    Console.WriteLine($"[UDP] Zahtev od klijenta {klijentEP}: {zahtev}");
 
-                        // Pošalji potvrdu klijentu
-                        string odgovor = "Server: Vaš zahtev je prihvaćen. Vozilo je u putu!";
+                    TaksiVozilo slobodnoVozilo = null;
+
+                    lock (lockObj)
+                    {
+                        slobodnoVozilo = TaksiVozila.FirstOrDefault(v => v.StatusVozila == StatusVozila.Slobodno);
+
+                        if (slobodnoVozilo != null)
+                        {
+                            slobodnoVozilo.StatusVozila = StatusVozila.Odlazak_Na_Lokaciju;
+                            klijent.StatusKlijenta = StatusKlijenta.Prihvaceno;
+                        }
+                    }
+
+                    if (slobodnoVozilo != null)
+                    {
+                        string zadatak = $"NOVI ZADATAK: {klijent.PocetneKoordinate.X}, {klijent.PocetneKoordinate.Y} - > {klijent.KrajnjeKoordinate.X}, {klijent.KrajnjeKoordinate.Y}";
+
+                        byte[] zadatakBytes = Encoding.UTF8.GetBytes(zadatak);
+                        slobodnoVozilo.Stream.Write(zadatakBytes, 0, zadatakBytes.Length);
+
+                        string odgovor = "Server: Vas zahtev je prihvacen. Vozilo je na putu!";
                         byte[] odgovorBytes = Encoding.UTF8.GetBytes(odgovor);
-                        udpClient.Send(odgovorBytes, odgovorBytes.Length, klijentEndPoint);
-                        Console.WriteLine("[UDP] ✓ Potvrda poslata klijentu!\n");
-                        Console.WriteLine("==========================================\n");
-                        statusVozila = "zauzet";
+                        udpClient.Send(odgovorBytes, odgovorBytes.Length, klijentEP);
+
+                        Console.WriteLine($"[SERVER] Zadovoljeno: zadatak poslat vozilu, klijent obavesten.");
                     }
                     else
                     {
                         string odgovor = "Server: Trenutno nema slobodnih vozila";
                         byte[] odgovorBytes = Encoding.UTF8.GetBytes(odgovor);
-                        udpClient.Send(odgovorBytes, odgovorBytes.Length, klijentEndPoint);
-                        Console.WriteLine("[UPOZORENJE] Nema povezanih vozila!\n");
+                        udpClient.Send(odgovorBytes, odgovorBytes.Length, klijentEP);
+
+                        Console.WriteLine($"[UPOZORENJE] Nema slobodnih vozila!");
                     }
                 }
+
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[GREŠKA UDP] {ex.Message}");
+                }
             }
-            catch (Exception ex)
+        }
+
+        static void VizuelizacijaLoop()
+        {
+            while (true)
             {
-                Console.WriteLine($"[GREŠKA UDP] {ex.Message}");
+                Thread.Sleep(2000);
+                Console.Clear();
+                lock (lockObj)
+                {
+                    Console.WriteLine("=== STATUS VOZILA ===");
+                    Console.WriteLine("ID\tPozicijaX\tPozicijaY\tStatus\tKm\tZarada");
+                    int id = 1;
+                    foreach (var vozilo in TaksiVozila)
+                    {
+                        Console.WriteLine($"{id++}\t" +
+                            $"{vozilo.KoordinateVozila.X}\t" +
+                            $"{vozilo.KoordinateVozila.Y}\t" +
+                            $"{vozilo.StatusVozila}\t" +
+                            $"{vozilo.PredjenaKilometraza}\t" +
+                            $"{vozilo.Zarada}");
+                    }
+
+                    Console.WriteLine("\n=== AKTIVNI KLIJENTI ===");
+                    Console.WriteLine("ID\tPocetnaX\tPocetnaY\tKrajnjaX\tKrajnjaY\tStatus");
+                    id = 1;
+
+                    foreach (var k in Klijenti)
+                    {
+                        Console.WriteLine($"{id++}\t{k.PocetneKoordinate.X}\t" +
+                            $"{k.PocetneKoordinate.Y}\t" +
+                            $"{k.KrajnjeKoordinate.X}\t" +
+                            $"{k.KrajnjeKoordinate.Y}\t" +
+                            $"{k.StatusKlijenta}");
+                    }
+                }
             }
         }
     }
