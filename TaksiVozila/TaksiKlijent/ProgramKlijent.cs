@@ -10,7 +10,7 @@ using System.Security.Cryptography;
 
 namespace TaksiKlijent
 {
-    class Program
+    class ProgramKlijent
     {
         private static UdpClient udpClient;
         private const string SERVER_IP = "127.0.0.1"; // localhost
@@ -66,8 +66,8 @@ namespace TaksiKlijent
 
                 Klijent klijent = new Klijent
                 {
-                    PocetneKoordinate = { X = pocetnaX, Y = pocetnaY },
-                    KrajnjeKoordinate = { X = krajnjaX, Y = krajnjaY },
+                    PocetneKoordinate = new Koordinate(pocetnaX, pocetnaY),
+                    KrajnjeKoordinate = new Koordinate(krajnjaX, krajnjaY),
                     StatusKlijenta = StatusKlijenta.Cekanje
                 };
 

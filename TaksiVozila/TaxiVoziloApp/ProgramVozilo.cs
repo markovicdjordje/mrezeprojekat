@@ -4,10 +4,12 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using TaxiCore.Enums;
+using TaxiCore.Models;
 
 namespace TaxiVoziloApp
 {
-    class Program
+    class ProgramVozilo
     {
         private static TcpClient tcpClient;
         private static NetworkStream stream;
@@ -27,36 +29,53 @@ namespace TaxiVoziloApp
                 Console.WriteLine("✓ Povezano sa serverom!\n");
 
                 // Pošalji početne podatke vozilu
-                Console.Write("Unesite trenutnu poziciju (npr. X:10, Y:20): ");
-                string pozicija = Console.ReadLine();
+                Console.Write("Unesite koordinate vozila (X) ");
+                string pocetnaTackaX = Console.ReadLine();
+                int pocetnaX;
+                if (int.TryParse(pocetnaTackaX, out pocetnaX) == false)
+                {
+                    Console.WriteLine("UNESI BROJ");
+                    return;
+                }
 
-                Console.Write("Unesite status (slobodan/zauzet): ");
-                string status = Console.ReadLine();
+                Console.Write("Unesite koordinate vozila (Y) ");
+                string pocetnaTackaY = Console.ReadLine();
+                int pocetnaY;
+                if (int.TryParse(pocetnaTackaY, out pocetnaY) == false)
+                {
+                    Console.WriteLine("UNESI BROJ");
+                    return;
+                }
 
-                string podaciVozila = $"Pozicija: {pozicija}, Status: {status}";
-                byte[] podatci = Encoding.UTF8.GetBytes(podaciVozila);
-                stream.Write(podatci, 0, podatci.Length);
+                TaksiVozilo taksi = new TaksiVozilo
+                {
+                    KoordinateVozila = new Koordinate(pocetnaX, pocetnaY),
+                    StatusVozila = StatusVozila.Slobodno
+                };
+                taksi.TcpClient = tcpClient;
+                taksi.Stream = stream;
+
+                string podaciVozila = $"{pocetnaX},{pocetnaY}, {StatusVozila.Slobodno}";
+                byte[] podatciBytes = Encoding.UTF8.GetBytes(podaciVozila);
+                stream.Write(podatciBytes, 0, podatciBytes.Length);
                 Console.WriteLine("\n✓ Podaci poslati serveru!\n");
 
-                // Primi potvrdu od servera
                 byte[] buffer = new byte[1024];
                 int bytesRead = stream.Read(buffer, 0, buffer.Length);
                 string potvrda = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                Console.WriteLine($"Server kaže: {potvrda}\n");
+                Console.WriteLine($"Server: {potvrda}\n");
 
-                // Sluša zadatke od servera
-                Console.WriteLine("Čekam zadatke od servera...\n");
+                Console.WriteLine("Cekam zadatke od servera...\n");
                 while (true)
                 {
-                    bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    bytesRead = stream.Read(buffer, 0, bytesRead);
                     if (bytesRead > 0)
                     {
                         string zadatak = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                        Console.WriteLine($"\n🚖 PRIMLJEN ZADATAK:");
-                        Console.WriteLine($"   {zadatak}");
-                        Console.WriteLine("\n[Vozilo kreće na lokaciju...]\n");
+                        Console.WriteLine($"\nPRIMLJEN ZADATAK: {zadatak}");
                     }
                 }
+               
             }
             catch (Exception ex)
             {

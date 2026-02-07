@@ -11,7 +11,7 @@ using TaxiCore.Enums;
 
 namespace TaksiServer
 {
-    class Program
+    class ProgramSrv
     {
         private static TcpListener tcpListener;
         private static UdpClient udpClient;
@@ -64,9 +64,9 @@ namespace TaksiServer
 
                 TaksiVozilo taksiVozilo = new TaksiVozilo
                 {
-                    TcpClient = tcpClient,
-                    Stream = stream,
-                    KoordinateVozila = { X = 0, Y = 0 },
+                    //TcpClient = tcpClient,
+                    //Stream = stream,
+                    KoordinateVozila = new Koordinate(0, 0),
                     StatusVozila = StatusVozila.Slobodno,
                     Zarada = 0,
                     PredjenaKilometraza = 0
@@ -102,8 +102,8 @@ namespace TaksiServer
 
                     Klijent klijent = new Klijent
                     {
-                        PocetneKoordinate = { X = 1, Y = 1 },
-                        KrajnjeKoordinate = { X = 2, Y = 2 },
+                        PocetneKoordinate = new Koordinate(1, 1),
+                        KrajnjeKoordinate = new Koordinate(2, 2),
                         StatusKlijenta = StatusKlijenta.Cekanje
                     };
 

@@ -15,8 +15,10 @@ namespace TaxiCore.Models
     [Serializable]
     public class TaksiVozilo
     {
-        public TcpClient TcpClient {  get; set; }
-        public NetworkStream Stream { get; set; }
+        [NonSerialized]
+        public TcpClient TcpClient;
+        [NonSerialized]
+        public NetworkStream Stream;
 
         public Koordinate KoordinateVozila {  get; set; }
         public StatusVozila StatusVozila { get; set; }
