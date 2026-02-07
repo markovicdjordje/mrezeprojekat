@@ -54,38 +54,44 @@ namespace TaksiServer
         // TCP - Prihvati povezivanje vozila
         static void PrihvatiVozilo()
         {
-            try
+            while (true)
             {
-                TcpClient tcpClient = tcpListener.AcceptTcpClient();
-                NetworkStream stream = tcpClient.GetStream();
-                byte[] buffer = new byte[1024];
-                int bytesRead = stream.Read(buffer, 0, buffer.Length);
-                string podaciVozila = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-
-                TaksiVozilo taksiVozilo = new TaksiVozilo
+                try
                 {
-                    //TcpClient = tcpClient,
-                    //Stream = stream,
-                    KoordinateVozila = new Koordinate(0, 0),
-                    StatusVozila = StatusVozila.Slobodno,
-                    Zarada = 0,
-                    PredjenaKilometraza = 0
-                };
+                    TcpClient tcpClient = tcpListener.AcceptTcpClient();
+                    NetworkStream stream = tcpClient.GetStream();
+                    byte[] buffer = new byte[1024];
+                    int bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    string podaciVozila = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                    var delovi = podaciVozila.Split(',');
+                    int x = int.Parse(delovi[0]);
+                    int y = int.Parse(delovi[1]);
 
-                lock (lockObj)
-                {
-                    TaksiVozila.Add(taksiVozilo);
+                    TaksiVozilo taksiVozilo = new TaksiVozilo
+                    {
+                        TcpClient = tcpClient,
+                        Stream = stream,
+                        KoordinateVozila = new Koordinate(x, y),
+                        StatusVozila = StatusVozila.Slobodno,
+                        Zarada = 0,
+                        PredjenaKilometraza = 0
+                    };
+
+                    lock (lockObj)
+                    {
+                        TaksiVozila.Add(taksiVozilo);
+                    }
+
+                    Console.Write($"[TCP] Novo vozilo se povezalo: {podaciVozila}");
+
+                    string potvrda = "Server: Vozilo registrovano";
+                    byte[] potvrdaBytes = Encoding.UTF8.GetBytes(potvrda);
+                    stream.Write(potvrdaBytes, 0, potvrdaBytes.Length);
                 }
-
-                Console.Write($"[TCP] Novo vozilo se povezalo: {podaciVozila}");
-
-                string potvrda = "Server: Vozilo registrovano";
-                byte[] potvrdaBytes = Encoding.UTF8.GetBytes(potvrda);
-                stream.Write(potvrdaBytes, 0, potvrdaBytes.Length);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[GREŠKA TCP] {ex.Message}");
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[GREŠKA TCP] {ex.Message}");
+                }
             }
         }
 
@@ -162,7 +168,7 @@ namespace TaksiServer
             while (true)
             {
                 Thread.Sleep(2000);
-                Console.Clear();
+                //Console.Clear();
                 lock (lockObj)
                 {
                     Console.WriteLine("=== STATUS VOZILA ===");
@@ -184,7 +190,7 @@ namespace TaksiServer
 
                     foreach (var k in Klijenti)
                     {
-                        Console.WriteLine($"{id++}\t{k.PocetneKoordinate.X}\t" +
+                        Console.WriteLine($"\n{id++}\t{k.PocetneKoordinate.X}\t" +
                             $"{k.PocetneKoordinate.Y}\t" +
                             $"{k.KrajnjeKoordinate.X}\t" +
                             $"{k.KrajnjeKoordinate.Y}\t" +

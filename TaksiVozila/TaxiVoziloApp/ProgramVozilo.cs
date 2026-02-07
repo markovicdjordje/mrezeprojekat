@@ -55,9 +55,10 @@ namespace TaxiVoziloApp
                 taksi.TcpClient = tcpClient;
                 taksi.Stream = stream;
 
-                string podaciVozila = $"{pocetnaX},{pocetnaY}, {StatusVozila.Slobodno}";
+                string podaciVozila = $"{pocetnaX},{pocetnaY},{StatusVozila.Slobodno}";
                 byte[] podatciBytes = Encoding.UTF8.GetBytes(podaciVozila);
                 stream.Write(podatciBytes, 0, podatciBytes.Length);
+                //stream.Write(taksi.Serialize());
                 Console.WriteLine("\n✓ Podaci poslati serveru!\n");
 
                 byte[] buffer = new byte[1024];
@@ -68,7 +69,7 @@ namespace TaxiVoziloApp
                 Console.WriteLine("Cekam zadatke od servera...\n");
                 while (true)
                 {
-                    bytesRead = stream.Read(buffer, 0, bytesRead);
+                    bytesRead = stream.Read(buffer, 0, buffer.Length);
                     if (bytesRead > 0)
                     {
                         string zadatak = Encoding.UTF8.GetString(buffer, 0, bytesRead);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using TaxiCore.Enums;
 
@@ -8,9 +9,14 @@ namespace TaxiCore.Models
     [Serializable]
     public class Klijent
     {
+        [NonSerialized]
+        public TcpClient TcpClient;
+
+        [NonSerialized]
+        public NetworkStream Stream;
+
         public Koordinate PocetneKoordinate { get; set; }
         public Koordinate KrajnjeKoordinate {  get; set; }
-
 
         public StatusKlijenta StatusKlijenta { get; set; }
 
