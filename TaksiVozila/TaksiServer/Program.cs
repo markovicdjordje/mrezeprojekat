@@ -19,6 +19,8 @@ namespace TaksiServer
         private const int TCP_PORT = 5000; // Port za vozila
         private const int UDP_PORT = 5001; // Port za klijente
 
+        private static string statusVozila = null;
+
         static void Main(string[] args)
         {
             Console.WriteLine("=== TAKSI SERVER ===");
@@ -59,6 +61,11 @@ namespace TaksiServer
                 Console.WriteLine($"[TCP] Primljeni podaci od vozila:");
                 Console.WriteLine($"      {podaciVozila}\n");
 
+                if (podaciVozila.Contains("slobodan"))
+                    statusVozila = "slobodan";
+                else
+                    statusVozila = "zauzet";
+                
                 // Pošalji potvrdu vozilu
                 string potvrda = "Server: Vozilo registrovano";
                 byte[] potvrdaBytes = Encoding.UTF8.GetBytes(potvrda);
@@ -86,8 +93,18 @@ namespace TaksiServer
                     Console.WriteLine($"[UDP] ✓ Primljen zahtev od klijenta {klijentEndPoint}:");
                     Console.WriteLine($"      {zahtevKlijenta}\n");
 
+
+                    if (voziloStream == null)
+                    {
+                        string odgovor = "Server: Vozilo još nije povezano, pokušajte kasnije.";
+                        byte[] odgovorBytes = Encoding.UTF8.GetBytes(odgovor);
+                        udpClient.Send(odgovorBytes, odgovorBytes.Length, klijentEndPoint);
+                        Console.WriteLine("[UPOZORENJE] Vozilo još nije povezano.\n");
+                        continue;
+                    }
+
                     // Obradi zahtev i pošalji vozilu
-                    if (voziloStream != null)
+                    if (statusVozila == "slobodan")
                     {
                         Console.WriteLine("[SERVER] Prosleđujem zadatak vozilu...");
                         string zadatak = $"NOVI ZADATAK: {zahtevKlijenta}";
@@ -101,9 +118,13 @@ namespace TaksiServer
                         udpClient.Send(odgovorBytes, odgovorBytes.Length, klijentEndPoint);
                         Console.WriteLine("[UDP] ✓ Potvrda poslata klijentu!\n");
                         Console.WriteLine("==========================================\n");
+                        statusVozila = "zauzet";
                     }
                     else
                     {
+                        string odgovor = "Server: Trenutno nema slobodnih vozila";
+                        byte[] odgovorBytes = Encoding.UTF8.GetBytes(odgovor);
+                        udpClient.Send(odgovorBytes, odgovorBytes.Length, klijentEndPoint);
                         Console.WriteLine("[UPOZORENJE] Nema povezanih vozila!\n");
                     }
                 }
