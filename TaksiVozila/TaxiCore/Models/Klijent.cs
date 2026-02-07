@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using TaksiServer.Enumeracije;
+using TaxiCore.Enums;
 
-namespace TaksiServer.Models
+namespace TaxiCore.Models
 {
     [Serializable]
     public class Klijent
@@ -13,7 +13,7 @@ namespace TaksiServer.Models
         public int KrajnjaX { get; set; }
         public int KrajnjaY { get; set; }
 
-        public StatusKlijenta StatusKlijenta {get; set;}
+        public StatusKlijenta StatusKlijenta { get; set; }
 
         public byte[] Serialize()
         {

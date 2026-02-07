@@ -49,5 +49,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TaxiCore\TaxiCore.csproj">
+      <Project>{51db2cd2-e431-4ff3-95f6-49c2745ec10c}</Project>
+      <Name>TaxiCore</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -3,19 +3,22 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
-using TaksiServer.Enumeracije;
+using TaxiCore.Enums;
+using TaxiCore.Models;
 
-namespace TaksiServer.Models
+namespace TaxiCore.Models
 {
     [Serializable]
-    public class Zadatak
+    public class TaksiVozilo
     {
-        public Klijent Klijent { get; set; }
-        public TaksiVozilo Vozilo { get; set; }
-        public StatusZadatka StatusZadatka { get; set; }
-        public double PredjenaRazdaljina { get; set; }
+        public int TrenutnaX { get; set; }
+        public int TrenutnaY { get; set; }
+        public StatusVozila StatusVozila { get; set; }
+        public double PredjenaKilometraza { get; set; }
+        public double Zarada { get; set; }
 
         public byte[] Serialize()
         {

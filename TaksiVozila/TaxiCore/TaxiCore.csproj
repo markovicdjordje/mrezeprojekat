@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C8409D93-1FEB-46CB-808E-D4690BBADB51}</ProjectGuid>
+    <ProjectGuid>{51DB2CD2-E431-4FF3-95F6-49C2745EC10C}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>TaksiServer</RootNamespace>
-    <AssemblyName>TaksiServer</AssemblyName>
+    <RootNamespace>TaxiCore</RootNamespace>
+    <AssemblyName>TaxiCore</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -43,17 +43,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\StatusKlijenta.cs" />
+    <Compile Include="Enums\StatusVozila.cs" />
+    <Compile Include="Enums\StatusZadatka.cs" />
+    <Compile Include="Models\Klijent.cs" />
+    <Compile Include="Models\TaksiVozilo.cs" />
+    <Compile Include="Models\Zadatak.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\TaxiCore\TaxiCore.csproj">
-      <Project>{51db2cd2-e431-4ff3-95f6-49c2745ec10c}</Project>
-      <Name>TaxiCore</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

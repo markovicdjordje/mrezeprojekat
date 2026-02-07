@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TaksiServer.Enumeracije
+namespace TaxiCore.Enums
 {
-    public enum StatusZadatka
+    public enum StatusVozila
     {
-        Aktivan,
-        Zavrsen
+        Slobodno,
+        Odlazak_Na_Lokaciju,
+        Voznja
     }
 }

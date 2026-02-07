@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TaksiServer.Enumeracije
+namespace TaxiCore
 {
-    public enum StatusVozila
+    internal class Program
     {
-        Slobodno,
-        Odlazak_Na_Lokaciju,
-        Voznja
+        static void Main(string[] args)
+        {
+        }
     }
 }
