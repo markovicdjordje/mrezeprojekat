@@ -1,0 +1,19 @@
+[
+  {
+    "Name": "Prvi",
+    "Projects": [
+      {
+        "Path": "TaksiServer\\TaksiServer.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "TaxiVoziloApp\\TaxiVoziloApp.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "TaksiKlijent\\TaksiKlijent.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
