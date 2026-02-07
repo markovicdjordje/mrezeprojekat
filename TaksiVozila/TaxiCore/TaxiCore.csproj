@@ -47,6 +47,7 @@
     <Compile Include="Enums\StatusVozila.cs" />
     <Compile Include="Enums\StatusZadatka.cs" />
     <Compile Include="Models\Klijent.cs" />
+    <Compile Include="Models\Koordinate.cs" />
     <Compile Include="Models\TaksiVozilo.cs" />
     <Compile Include="Models\Zadatak.cs" />
     <Compile Include="Program.cs" />

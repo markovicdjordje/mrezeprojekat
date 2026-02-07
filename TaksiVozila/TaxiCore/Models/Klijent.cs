@@ -8,10 +8,9 @@ namespace TaxiCore.Models
     [Serializable]
     public class Klijent
     {
-        public int PocetnaX { get; set; }
-        public int PocetnaY { get; set; }
-        public int KrajnjaX { get; set; }
-        public int KrajnjaY { get; set; }
+        public Koordinate PocetneKoordinate { get; set; }
+        public Koordinate KrajnjeKoordinate {  get; set; }
+
 
         public StatusKlijenta StatusKlijenta { get; set; }
 

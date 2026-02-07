@@ -14,8 +14,7 @@ namespace TaxiCore.Models
     [Serializable]
     public class TaksiVozilo
     {
-        public int TrenutnaX { get; set; }
-        public int TrenutnaY { get; set; }
+        public Koordinate KoordinateVozila {  get; set; }
         public StatusVozila StatusVozila { get; set; }
         public double PredjenaKilometraza { get; set; }
         public double Zarada { get; set; }
