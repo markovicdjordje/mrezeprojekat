@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5B204C44-E88F-4828-818B-8FF4963998E6}</ProjectGuid>
+    <ProjectGuid>{AC87D55E-021A-40DB-B668-9FEFE4339705}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>TaksiVozila</RootNamespace>
     <AssemblyName>TaksiVozila</AssemblyName>
