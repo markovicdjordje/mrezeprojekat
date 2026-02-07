@@ -1,0 +1,7 @@
+C:\Users\HP\source\repos\mrezeprojekat\TaksiServer\bin\Debug\TaksiServer.exe.config
+C:\Users\HP\source\repos\mrezeprojekat\TaksiServer\bin\Debug\TaksiServer.exe
+C:\Users\HP\source\repos\mrezeprojekat\TaksiServer\bin\Debug\TaksiServer.pdb
+C:\Users\HP\source\repos\mrezeprojekat\TaksiServer\obj\Debug\TaksiServer.csproj.AssemblyReference.cache
+C:\Users\HP\source\repos\mrezeprojekat\TaksiServer\obj\Debug\TaksiServer.csproj.CoreCompileInputs.cache
+C:\Users\HP\source\repos\mrezeprojekat\TaksiServer\obj\Debug\TaksiServer.exe
+C:\Users\HP\source\repos\mrezeprojekat\TaksiServer\obj\Debug\TaksiServer.pdb

@@ -1,0 +1,7 @@
+C:\Users\HP\source\repos\mrezeprojekat\TaxiVoziloApp\bin\Debug\TaxiVoziloApp.exe.config
+C:\Users\HP\source\repos\mrezeprojekat\TaxiVoziloApp\bin\Debug\TaxiVoziloApp.exe
+C:\Users\HP\source\repos\mrezeprojekat\TaxiVoziloApp\bin\Debug\TaxiVoziloApp.pdb
+C:\Users\HP\source\repos\mrezeprojekat\TaxiVoziloApp\obj\Debug\TaxiVoziloApp.csproj.AssemblyReference.cache
+C:\Users\HP\source\repos\mrezeprojekat\TaxiVoziloApp\obj\Debug\TaxiVoziloApp.csproj.CoreCompileInputs.cache
+C:\Users\HP\source\repos\mrezeprojekat\TaxiVoziloApp\obj\Debug\TaxiVoziloApp.exe
+C:\Users\HP\source\repos\mrezeprojekat\TaxiVoziloApp\obj\Debug\TaxiVoziloApp.pdb
