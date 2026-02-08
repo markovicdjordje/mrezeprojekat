@@ -22,6 +22,7 @@ namespace TaksiServer
 
         private static List<TaksiVozilo> TaksiVozila = new List<TaksiVozilo>();
         private static List<Klijent> Klijenti = new List<Klijent>();
+        private static List<Zadatak> Zadaci = new List<Zadatak>();
         private static readonly object lockObj = new object();
 
         //private static int rbTaxi = 0;
@@ -222,19 +223,31 @@ namespace TaksiServer
                     {
                         if (poruka == "STIGAO_PO_KLIJENTA")
                         {
-                            vozilo.StatusVozila = StatusVozila.Voznja;
+                            //vozilo.StatusVozila = StatusVozila.Voznja;
+                            var zadatak = Zadaci
+        .FirstOrDefault(z => z.Vozilo == vozilo && z.StatusZadatka == StatusZadatka.Aktivan);
+
+                            //if (zadatak != null)
+                                //zadatak.StatusZadatka = StatusZadatka.Aktivan;
                         }
                         else if (poruka == "VOZNJA_ZAVRSENA")
                         {
+                            var zadatak = Zadaci.FirstOrDefault(z => z.Vozilo == vozilo && z.StatusZadatka == StatusZadatka.Aktivan);
+
+                            if (zadatak != null)
+                            {
+                                zadatak.StatusZadatka = StatusZadatka.Zavrsen;
+                                zadatak.Klijent.StatusKlijenta = StatusKlijenta.Zavrseno;
+                            }
+
                             vozilo.StatusVozila = StatusVozila.Slobodno;
                             vozilo.Zarada += 500;
                             vozilo.PredjenaKilometraza += 5;
 
-                            var aktivniKlijent = Klijenti
-        .FirstOrDefault(k => k.StatusKlijenta == StatusKlijenta.Prihvaceno);
+                            //var aktivniKlijent = Klijenti.FirstOrDefault(k => k.StatusKlijenta == StatusKlijenta.Prihvaceno);
 
-                            if (aktivniKlijent != null)
-                                aktivniKlijent.StatusKlijenta = StatusKlijenta.Zavrseno;
+                            //if (aktivniKlijent != null)
+                                //aktivniKlijent.StatusKlijenta = StatusKlijenta.Zavrseno;
 
                             //if (vozilo.)
 
@@ -342,12 +355,24 @@ namespace TaksiServer
                         .OrderBy(v => v.KoordinateVozila.Distanca(klijent.PocetneKoordinate))
                         .First();
 
+                    var zadatak = new Zadatak
+                    {
+                        Klijent = klijent,
+                        Vozilo = najblizeVozilo,
+                        StatusZadatka = StatusZadatka.Aktivan,
+                        PredjenaRazdaljina = 0
+                    };
+
+                    Zadaci.Add(zadatak);
+
+
+
                     // Dodeli klijenta
                     najblizeVozilo.StatusVozila = StatusVozila.Odlazak_Na_Lokaciju;
                     klijent.StatusKlijenta = StatusKlijenta.Prihvaceno;
 
-                    string zadatak = $"NOVI_ZADATAK:{klijent.PocetneKoordinate.X}:{klijent.PocetneKoordinate.Y}:{klijent.KrajnjeKoordinate.X}:{klijent.KrajnjeKoordinate.Y}";
-                    byte[] zadatakBytes = Encoding.UTF8.GetBytes(zadatak);
+                    string zadatakS = $"NOVI_ZADATAK:{klijent.PocetneKoordinate.X}:{klijent.PocetneKoordinate.Y}:{klijent.KrajnjeKoordinate.X}:{klijent.KrajnjeKoordinate.Y}";
+                    byte[] zadatakBytes = Encoding.UTF8.GetBytes(zadatakS);
                     najblizeVozilo.Stream.Write(zadatakBytes, 0, zadatakBytes.Length);
 
                     //rbTaxi++;
