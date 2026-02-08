@@ -46,6 +46,8 @@ namespace TaksiServer
             Thread visuelizacijaThread = new Thread(VizuelizacijaLoop);
             visuelizacijaThread.Start();
 
+            StartDispatcherLoop();
+
             PrihvatiKlijente();
         }
         static void PrihvatiVozilo()
@@ -166,12 +168,8 @@ namespace TaksiServer
                     {
                         if (poruka == "STIGAO_PO_KLIJENTA")
                         {
-                            //vozilo.StatusVozila = StatusVozila.Voznja;
                             var zadatak = Zadaci
         .FirstOrDefault(z => z.Vozilo == vozilo && z.StatusZadatka == StatusZadatka.Aktivan);
-
-                            //if (zadatak != null)
-                                //zadatak.StatusZadatka = StatusZadatka.Aktivan;
                         }
                         else if (poruka == "VOZNJA_ZAVRSENA")
                         {
@@ -185,7 +183,7 @@ namespace TaksiServer
                             double distanca = zadatak.Klijent.PocetneKoordinate.Distanca(zadatak.Klijent.KrajnjeKoordinate);
                             double distancaUkm = Math.Round(distanca * 0.1, 1);
 
-                            double zarada = distancaUkm * 100;
+                            double zarada = distancaUkm * 120;
 
                             //Console.WriteLine($"KLIJENT DISTANCA: {distanca}");
 
@@ -285,5 +283,19 @@ namespace TaksiServer
             }
         }
 
+        static void StartDispatcherLoop()
+        {
+            new Thread(() =>
+            {
+                while (true)
+                {
+                    lock (lockObj)
+                    {
+                        DodeliZadatke();
+                    }
+                    Thread.Sleep(500); // proverava svakih 0.5 sekundi
+                }
+            }).Start();
+        }
     }
 }
