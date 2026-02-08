@@ -24,6 +24,8 @@ namespace TaksiServer
         private static List<Klijent> Klijenti = new List<Klijent>();
         private static readonly object lockObj = new object();
 
+        //private static int rbTaxi = 0;
+
         //private static string statusVozila = null;
 
         static void Main(string[] args)
@@ -149,6 +151,8 @@ namespace TaksiServer
 
                     TaksiVozilo slobodnoVozilo = null;
 
+                    slobodnoVozilo = TaksiVozila.Where(v => v.StatusVozila == StatusVozila.Slobodno && v.Stream != null).OrderBy(v => v.KoordinateVozila.Distanca(klijent.PocetneKoordinate)).FirstOrDefault();
+
                     lock (lockObj)
                     {
                         Klijenti.Add(klijent);
@@ -167,8 +171,11 @@ namespace TaksiServer
                         */
                     }
                     DodeliZadatke();
+                    string odgovor = "Server: Vas zahtev je prihvaćen. Čekate dodelu vozila.";
+                    byte[] odgovorBytes = Encoding.UTF8.GetBytes(odgovor);
+                    udpClient.Send(odgovorBytes, odgovorBytes.Length, klijentEP);
 
-                    if (slobodnoVozilo != null)
+                    /*if (slobodnoVozilo != null)
                     {
                         string zadatak = $"NOVI_ZADATAK:{x1}:{y1}:{x2}:{y2}";
                         byte[] zadatakBytes = Encoding.UTF8.GetBytes(zadatak);
@@ -188,7 +195,8 @@ namespace TaksiServer
                         udpClient.Send(odgovorBytes, odgovorBytes.Length, klijentEP);
 
                         Console.WriteLine("[UPOZORENJE] Nema slobodnih vozila.");
-                    }
+                    }*/
+
                 }
 
                 catch (Exception ex)
@@ -227,6 +235,8 @@ namespace TaksiServer
 
                             if (aktivniKlijent != null)
                                 aktivniKlijent.StatusKlijenta = StatusKlijenta.Zavrseno;
+
+                            //if (vozilo.)
 
                             DodeliZadatke();
                         }
@@ -340,7 +350,13 @@ namespace TaksiServer
                     byte[] zadatakBytes = Encoding.UTF8.GetBytes(zadatak);
                     najblizeVozilo.Stream.Write(zadatakBytes, 0, zadatakBytes.Length);
 
+                    //rbTaxi++;
                     Console.WriteLine($"[SERVER] Klijent dodeljen najbližem vozilu.");
+                    Console.WriteLine(
+                    $"[DISPEČER] Taksi ide po klijenta " +
+                    $"({klijent.PocetneKoordinate.X},{klijent.PocetneKoordinate.Y}) → " +
+                    $"({klijent.KrajnjeKoordinate.X},{klijent.KrajnjeKoordinate.Y})"
+);
 
                     // Ukloni vozilo iz liste slobodnih da ne bi dodeljeno više puta
                     slobodnaVozila.Remove(najblizeVozilo);
