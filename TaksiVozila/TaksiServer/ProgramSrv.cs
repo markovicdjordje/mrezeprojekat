@@ -185,7 +185,7 @@ namespace TaksiServer
                             double distanca = zadatak.Klijent.PocetneKoordinate.Distanca(zadatak.Klijent.KrajnjeKoordinate);
                             double distancaUkm = Math.Round(distanca * 0.1, 1);
 
-                            double zarada = distancaUkm * 300;
+                            double zarada = distancaUkm * 100;
 
                             //Console.WriteLine($"KLIJENT DISTANCA: {distanca}");
 
