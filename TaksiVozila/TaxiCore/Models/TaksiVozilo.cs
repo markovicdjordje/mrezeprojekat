@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Security.Cryptography;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
@@ -43,5 +44,18 @@ namespace TaxiCore.Models
                 return (TaksiVozilo)formatter.Deserialize(ms);
             }
         }
+
+        public static string Header()
+        {
+            return $@"| {"KoordinateX",-5} | {"KoordinateY",-5} | {"Status",-10} | {"Kilometraza",-5} | {"Zarada",-5}" +
+                   "\n--------------------------------------------------------------------------------------------------------------------";
+        }
+
+        public override string ToString()
+        {
+            return $@"| {KoordinateVozila.X,-11} | {KoordinateVozila.Y,-11} | {StatusVozila,-10} | {PredjenaKilometraza,-11} | {Zarada,-5}";
+        }
+
+
     }
 }

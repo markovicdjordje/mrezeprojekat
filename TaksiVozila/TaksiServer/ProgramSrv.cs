@@ -83,22 +83,6 @@ namespace TaksiServer
                     lock (lockObj)
                     {
                         TaksiVozila.Add(taksiVozilo);
-
-                        // provera da li postoji klijent koji vec ceka:
-
-                        /*var cekajuciKlijent = Klijenti.FirstOrDefault(k => k.StatusKlijenta == StatusKlijenta.Cekanje);
-
-                        if (cekajuciKlijent != null)
-                        {
-                            taksiVozilo.StatusVozila = StatusVozila.Odlazak_Na_Lokaciju;
-                            cekajuciKlijent.StatusKlijenta = StatusKlijenta.Prihvaceno;
-
-                            string zadatak = $"NOVI_ZADATAK:{cekajuciKlijent.PocetneKoordinate.X}:{cekajuciKlijent.PocetneKoordinate.Y}:{cekajuciKlijent.KrajnjeKoordinate.X}:{cekajuciKlijent.KrajnjeKoordinate.Y}";
-                            byte[] zadatakBytes = Encoding.UTF8.GetBytes(zadatak);
-                            taksiVozilo.Stream.Write(zadatakBytes, 0, zadatakBytes.Length);
-                            Console.WriteLine("[SERVER] Dodeljen zadatak čekajućem klijentu nakon registracije vozila."); 
-                        }
-                        */
                     }
                     DodeliZadatke();
 
@@ -157,46 +141,12 @@ namespace TaksiServer
                     lock (lockObj)
                     {
                         Klijenti.Add(klijent);
-
-                        //slobodnoVozilo = TaksiVozila.FirstOrDefault(v => v.StatusVozila == StatusVozila.Slobodno && v.Stream != null);
-
-                        // bira najblize vozilo 
-                        /*
-                        slobodnoVozilo = TaksiVozila.Where(v => v.StatusVozila == StatusVozila.Slobodno && v.Stream != null).OrderBy(v => v.KoordinateVozila.Distanca(klijent.PocetneKoordinate)).FirstOrDefault();
-
-                        if (slobodnoVozilo != null)
-                        {
-                            slobodnoVozilo.StatusVozila = StatusVozila.Odlazak_Na_Lokaciju;
-                            klijent.StatusKlijenta = StatusKlijenta.Prihvaceno;
-                        }
-                        */
                     }
                     DodeliZadatke();
                     string odgovor = "Server: Vas zahtev je prihvaćen. Čekate dodelu vozila.";
                     byte[] odgovorBytes = Encoding.UTF8.GetBytes(odgovor);
                     udpClient.Send(odgovorBytes, odgovorBytes.Length, klijentEP);
 
-                    /*if (slobodnoVozilo != null)
-                    {
-                        string zadatak = $"NOVI_ZADATAK:{x1}:{y1}:{x2}:{y2}";
-                        byte[] zadatakBytes = Encoding.UTF8.GetBytes(zadatak);
-                        slobodnoVozilo.Stream.Write(zadatakBytes, 0, zadatakBytes.Length);
-
-                        string odgovor = "Server: Vas zahtev je prihvacen. Vozilo je na putu.";
-                        byte[] odgovorBytes = Encoding.UTF8.GetBytes(odgovor);
-                        udpClient.Send(odgovorBytes, odgovorBytes.Length, klijentEP);
-
-                        Console.WriteLine("[SERVER] Zadatak poslat vozilu, klijent obavešten.");
-                    }
-                    else
-                    {
-                        // AKO NEMA SLOBODNIH VOZILA
-                        string odgovor = "Server: Trenutno nema slobodnih vozila.";
-                        byte[] odgovorBytes = Encoding.UTF8.GetBytes(odgovor);
-                        udpClient.Send(odgovorBytes, odgovorBytes.Length, klijentEP);
-
-                        Console.WriteLine("[UPOZORENJE] Nema slobodnih vozila.");
-                    }*/
 
                 }
 
@@ -244,7 +194,7 @@ namespace TaksiServer
 
                             double zarada = distancaUkm * 300;
 
-                            Console.WriteLine($"KLIJENT DISTANCA: {distanca}");
+                            //Console.WriteLine($"KLIJENT DISTANCA: {distanca}");
 
                             vozilo.StatusVozila = StatusVozila.Slobodno;
                             vozilo.Zarada += zarada;
@@ -267,22 +217,25 @@ namespace TaksiServer
         {
             while (true)
             {
-                Console.WriteLine("\n-------------------------------------------------\n");
+                Console.WriteLine("\n-----------------------------------------------------------------------------------\n");
                 Thread.Sleep(5000);
                 //Console.Clear();
                 lock (lockObj)
                 {
-                    Console.WriteLine("\n\t\t\t=== STATUS VOZILA ===");
-                    Console.WriteLine("ID\tPozicijaX\tPozicijaY\tStatus\t\tKm\t\tZarada");
                     int id = 1;
+
+                    Console.WriteLine("| KoordinateX | KoordinateY | Status     | Kilometraza | Zarada");
+                    Console.WriteLine("---------------------------------------------------------------");
                     foreach (var vozilo in TaksiVozila)
                     {
-                        Console.WriteLine($"{id++}\t\t" +
+                        
+                        Console.WriteLine(vozilo.ToString());
+                        /*Console.WriteLine($"|{id++}\t\t" +
                             $"{vozilo.KoordinateVozila.X}\t" +
                             $"{vozilo.KoordinateVozila.Y}\t\t" +
                             $"{vozilo.StatusVozila}\t\t" +
                             $"{vozilo.PredjenaKilometraza}\t\t" +
-                            $"{vozilo.Zarada}");
+                            $"{vozilo.Zarada}");*/
                     }
 
                     Console.WriteLine("\n\t\t\t=== AKTIVNI KLIJENTI ===");
@@ -300,38 +253,6 @@ namespace TaksiServer
                 }
             }
         }
-
-        /*static void DodeliZadatke()
-        {
-            lock(lockObj)
-            {
-                var slobodnaVozila = TaksiVozila.Where(v => v.StatusVozila == StatusVozila.Slobodno && v.Stream != null).ToList();
-
-                var cekajuciKlijenti = Klijenti.Where(k => k.StatusKlijenta == StatusKlijenta.Cekanje).ToList();
-
-                foreach (var klijent in cekajuciKlijenti)
-                {
-                    if (slobodnaVozila.Count == 0)
-                        break;
-
-                    var vozilo = slobodnaVozila.OrderBy(v => v.KoordinateVozila.Distanca(klijent.PocetneKoordinate)).First();
-
-                    // dodeli zadatak
-
-                    vozilo.StatusVozila = StatusVozila.Odlazak_Na_Lokaciju;
-                    klijent.StatusKlijenta = StatusKlijenta.Prihvaceno;
-
-                    string zadatak = $"NOVI_ZADATAK:{klijent.PocetneKoordinate.X}:{klijent.PocetneKoordinate.Y}:{klijent.KrajnjeKoordinate.X}:{klijent.KrajnjeKoordinate.Y}";
-
-                    byte[] zadatakBytes = Encoding.UTF8.GetBytes(zadatak);
-                    vozilo.Stream.Write(zadatakBytes, 0, zadatakBytes.Length);
-
-                    Console.WriteLine($"[SERVER]Zadovoljeno: klijent dodeljen vozilu.");
-
-                    slobodnaVozila.Remove(vozilo);
-                }
-            }
-        }*/
 
         static void DodeliZadatke()
         {
