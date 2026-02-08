@@ -35,12 +35,12 @@ namespace TaxiCore.Models
             }
         }
 
-        public static Klijent Deserialize(byte[] data)
+        public static TaksiVozilo Deserialize(byte[] data)
         {
             using (MemoryStream ms = new MemoryStream(data))
             {
                 BinaryFormatter formatter = new BinaryFormatter();
-                return (Klijent)formatter.Deserialize(ms);
+                return (TaksiVozilo)formatter.Deserialize(ms);
             }
         }
     }
