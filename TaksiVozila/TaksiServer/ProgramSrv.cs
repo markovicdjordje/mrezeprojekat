@@ -273,15 +273,15 @@ namespace TaksiServer
                 lock (lockObj)
                 {
                     Console.WriteLine("\n=== STATUS VOZILA ===");
-                    Console.WriteLine("ID\tPozicijaX\tPozicijaY\tStatus\tKm\tZarada");
+                    Console.WriteLine("ID\tPozicijaX\tPozicijaY\tStatus\t\tKm\t\tZarada");
                     int id = 1;
                     foreach (var vozilo in TaksiVozila)
                     {
-                        Console.WriteLine($"{id++}\t" +
+                        Console.WriteLine($"{id++}\t\t" +
                             $"{vozilo.KoordinateVozila.X}\t" +
-                            $"{vozilo.KoordinateVozila.Y}\t" +
-                            $"{vozilo.StatusVozila}\t" +
-                            $"{vozilo.PredjenaKilometraza}\t" +
+                            $"{vozilo.KoordinateVozila.Y}\t\t" +
+                            $"{vozilo.StatusVozila}\t\t" +
+                            $"{vozilo.PredjenaKilometraza}\t\t" +
                             $"{vozilo.Zarada}");
                     }
 
@@ -291,10 +291,10 @@ namespace TaksiServer
 
                     foreach (var k in Klijenti)
                     {
-                        Console.WriteLine($"\n{id++}\t{k.PocetneKoordinate.X}\t" +
-                            $"{k.PocetneKoordinate.Y}\t" +
-                            $"{k.KrajnjeKoordinate.X}\t" +
-                            $"{k.KrajnjeKoordinate.Y}\t" +
+                        Console.WriteLine($"\n{id++}\t\t{k.PocetneKoordinate.X}\t\t" +
+                            $"{k.PocetneKoordinate.Y}\t\t" +
+                            $"{k.KrajnjeKoordinate.X}\t\t" +
+                            $"{k.KrajnjeKoordinate.Y}\t\t" +
                             $"{k.StatusKlijenta}");
                     }
                 }
