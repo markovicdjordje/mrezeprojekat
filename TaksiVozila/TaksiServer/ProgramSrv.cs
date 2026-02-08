@@ -239,17 +239,17 @@ namespace TaksiServer
                                 zadatak.StatusZadatka = StatusZadatka.Zavrsen;
                                 zadatak.Klijent.StatusKlijenta = StatusKlijenta.Zavrseno;
                             }
+                            double distanca = zadatak.Klijent.PocetneKoordinate.Distanca(zadatak.Klijent.KrajnjeKoordinate);
+                            double distancaUkm = Math.Round(distanca * 0.1, 1);
+
+                            double zarada = distancaUkm * 300;
+
+                            Console.WriteLine($"KLIJENT DISTANCA: {distanca}");
 
                             vozilo.StatusVozila = StatusVozila.Slobodno;
-                            vozilo.Zarada += 500;
-                            vozilo.PredjenaKilometraza += 5;
+                            vozilo.Zarada += zarada;
+                            vozilo.PredjenaKilometraza += distancaUkm;
 
-                            //var aktivniKlijent = Klijenti.FirstOrDefault(k => k.StatusKlijenta == StatusKlijenta.Prihvaceno);
-
-                            //if (aktivniKlijent != null)
-                                //aktivniKlijent.StatusKlijenta = StatusKlijenta.Zavrseno;
-
-                            //if (vozilo.)
 
                             DodeliZadatke();
                         }
