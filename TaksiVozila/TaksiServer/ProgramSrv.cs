@@ -107,25 +107,36 @@ namespace TaksiServer
                     byte[] primljeniPodaci = udpClient.Receive(ref klijentEP);
                     string zahtev = Encoding.UTF8.GetString(primljeniPodaci);
 
-                    Klijent klijent = new Klijent
-                    {
-                        PocetneKoordinate = new Koordinate(1, 1),
-                        KrajnjeKoordinate = new Koordinate(2, 2),
-                        StatusKlijenta = StatusKlijenta.Cekanje
-                    };
+                    Console.WriteLine($"[UDP] Zahtev od klijenta {klijentEP}: {zahtev}");
 
-                    lock (lockObj)
+                    var delovi = zahtev.Split(':');
+
+                    if (delovi.Length != 4)
                     {
-                        Klijenti.Add(klijent);
+                        Console.WriteLine("[GREŠKA] Pogrešan format zahteva");
+                        continue;
                     }
 
-                    Console.WriteLine($"[UDP] Zahtev od klijenta {klijentEP}: {zahtev}");
+                    int x1 = int.Parse(delovi[0]);
+                    int y1 = int.Parse(delovi[1]);
+                    int x2 = int.Parse(delovi[2]);
+                    int y2 = int.Parse(delovi[3]);
+
+                    Klijent klijent = new Klijent
+                    {
+                        PocetneKoordinate = new Koordinate(x1, y1),
+                        KrajnjeKoordinate = new Koordinate(x2, y2),
+                        StatusKlijenta = StatusKlijenta.Cekanje
+                    };
 
                     TaksiVozilo slobodnoVozilo = null;
 
                     lock (lockObj)
                     {
-                        slobodnoVozilo = TaksiVozila.FirstOrDefault(v => v.StatusVozila == StatusVozila.Slobodno);
+                        Klijenti.Add(klijent);
+
+                        slobodnoVozilo = TaksiVozila.FirstOrDefault(v => v.StatusVozila == StatusVozila.Slobodno &&
+                        v.Stream != null);
 
                         if (slobodnoVozilo != null)
                         {
@@ -136,24 +147,24 @@ namespace TaksiServer
 
                     if (slobodnoVozilo != null)
                     {
-                        string zadatak = $"NOVI ZADATAK: {klijent.PocetneKoordinate.X}, {klijent.PocetneKoordinate.Y} - > {klijent.KrajnjeKoordinate.X}, {klijent.KrajnjeKoordinate.Y}";
-
+                        string zadatak = $"NOVI_ZADATAK:{x1}:{y1}:{x2}:{y2}";
                         byte[] zadatakBytes = Encoding.UTF8.GetBytes(zadatak);
                         slobodnoVozilo.Stream.Write(zadatakBytes, 0, zadatakBytes.Length);
 
-                        string odgovor = "Server: Vas zahtev je prihvacen. Vozilo je na putu!";
+                        string odgovor = "Server: Vas zahtev je prihvacen. Vozilo je na putu.";
                         byte[] odgovorBytes = Encoding.UTF8.GetBytes(odgovor);
                         udpClient.Send(odgovorBytes, odgovorBytes.Length, klijentEP);
 
-                        Console.WriteLine($"[SERVER] Zadovoljeno: zadatak poslat vozilu, klijent obavesten.");
+                        Console.WriteLine("[SERVER] Zadatak poslat vozilu, klijent obavešten.");
                     }
                     else
                     {
-                        string odgovor = "Server: Trenutno nema slobodnih vozila";
+                        // 4. AKO NEMA SLOBODNIH VOZILA
+                        string odgovor = "Server: Trenutno nema slobodnih vozila.";
                         byte[] odgovorBytes = Encoding.UTF8.GetBytes(odgovor);
                         udpClient.Send(odgovorBytes, odgovorBytes.Length, klijentEP);
 
-                        Console.WriteLine($"[UPOZORENJE] Nema slobodnih vozila!");
+                        Console.WriteLine("[UPOZORENJE] Nema slobodnih vozila.");
                     }
                 }
 
@@ -187,6 +198,12 @@ namespace TaksiServer
                             vozilo.StatusVozila = StatusVozila.Slobodno;
                             vozilo.Zarada += 500;
                             vozilo.PredjenaKilometraza += 5;
+
+                            var aktivniKlijent = Klijenti
+        .FirstOrDefault(k => k.StatusKlijenta == StatusKlijenta.Prihvaceno);
+
+                            if (aktivniKlijent != null)
+                                aktivniKlijent.StatusKlijenta = StatusKlijenta.Zavrseno;
                         }
                     }
                 }
@@ -202,6 +219,7 @@ namespace TaksiServer
         {
             while (true)
             {
+                Console.WriteLine("\n-------------------------------------------------\n");
                 Thread.Sleep(2000);
                 //Console.Clear();
                 lock (lockObj)

@@ -72,7 +72,8 @@ namespace TaksiKlijent
                 };
 
                 // Kreiraj zahtev
-                string zahtev = $"Od: {pocetnaX}:{pocetnaY} -> Do: {krajnjaX}:{krajnjaY}";
+                // izmena ovde string zahtev = $"Od: {pocetnaX}:{pocetnaY} -> Do: {krajnjaX}:{krajnjaY}";
+                string zahtev = $"{pocetnaX}:{pocetnaY}:{krajnjaX}:{krajnjaY}";
                 byte[] zahtevBytes = Encoding.UTF8.GetBytes(zahtev);
 
                 // Pošalji zahtev serveru preko UDP

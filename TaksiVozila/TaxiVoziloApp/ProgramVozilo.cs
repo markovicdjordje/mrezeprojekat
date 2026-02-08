@@ -48,7 +48,35 @@ namespace TaxiVoziloApp
                     return;
                 }
 
-                TaksiVozilo taksi = new TaksiVozilo
+                string registracija = $"{pocetnaX}, {pocetnaY},{StatusVozila.Slobodno}";
+                Posalji(registracija);
+
+                string potvrda = Procitaj();
+                Console.WriteLine($"Server: {potvrda}");
+                Console.WriteLine("Cekam zadatke...\n");
+
+                while (true)
+                {
+                    string poruka = Procitaj();
+                    if (poruka == null) break;
+
+                    if (!poruka.StartsWith("NOVI_ZADATAK"))
+                        continue;
+
+                    Console.WriteLine($"[ZADATAK] {poruka}");
+
+                    Console.WriteLine("Idem po klijenta...");
+                    Thread.Sleep(3000);
+                    Posalji("STIGAO_PO_KLIJENTA");
+
+                    Console.WriteLine("Vozim klijenta...");
+                    Thread.Sleep(5000);
+                    Posalji("VOZNJA_ZAVRSENA");
+
+                    Console.WriteLine("Voznja zavrsena\n");
+                }
+
+                /*TaksiVozilo taksi = new TaksiVozilo
                 {
                     KoordinateVozila = new Koordinate(pocetnaX, pocetnaY),
                     StatusVozila = StatusVozila.Slobodno
@@ -87,17 +115,6 @@ namespace TaxiVoziloApp
                     Posalji("VOZNJA_ZAVRSENA");
 
                     Console.WriteLine("✓ Vožnja završena\n");
-                }
-
-
-                /*while (true)
-                {
-                    bytesRead = stream.Read(buffer, 0, buffer.Length);
-                    if (bytesRead > 0)
-                    {
-                        string zadatak = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                        Console.WriteLine($"\nPRIMLJEN ZADATAK: {zadatak}");
-                    }
                 }*/
                
             }
@@ -115,6 +132,15 @@ namespace TaxiVoziloApp
         {
             byte[] data = Encoding.UTF8.GetBytes(poruka);
             stream.Write(data, 0, data.Length);
+        }
+
+        static string Procitaj()
+        {
+            byte[] buffer = new byte[1024];
+            int bytesRead = stream.Read(buffer, 0, buffer.Length);
+            if (bytesRead == 0) return null;
+
+            return Encoding.UTF8.GetString(buffer, 0, bytesRead);
         }
     }
 }
