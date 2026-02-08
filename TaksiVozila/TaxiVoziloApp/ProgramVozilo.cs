@@ -160,7 +160,7 @@ namespace TaxiVoziloApp
                     Console.WriteLine($"Server: {Encoding.UTF8.GetString(buffer, 0, bytesRead)}");
 
                     // Pokreni thread za ovo vozilo
-                    Thread t = new Thread(() => ObradaVozila(tcpClient, stream, i + 1));
+                    Thread t = new Thread(() => ObradaVozila(tcpClient, stream, i));
                     t.Start();
                 }
 
