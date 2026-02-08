@@ -38,5 +38,10 @@ namespace TaxiCore.Models
                 return (Klijent)formatter.Deserialize(ms);
             }
         }
+
+        public override string ToString()
+        {
+            return $"| {PocetneKoordinate.X,-11} | {PocetneKoordinate.Y,-11} | {KrajnjeKoordinate.X,-11} | {KrajnjeKoordinate.Y,-11} | {StatusKlijenta,-10}";
+        }
     }
 }

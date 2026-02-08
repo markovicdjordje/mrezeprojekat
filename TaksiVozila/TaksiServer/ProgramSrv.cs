@@ -217,7 +217,7 @@ namespace TaksiServer
         {
             while (true)
             {
-                Console.WriteLine("\n-----------------------------------------------------------------------------------\n");
+                Console.WriteLine("\n---------------------------------------------------------------------\n");
                 Thread.Sleep(5000);
                 //Console.Clear();
                 lock (lockObj)
@@ -225,30 +225,21 @@ namespace TaksiServer
                     int id = 1;
 
                     Console.WriteLine("| KoordinateX | KoordinateY | Status     | Kilometraza | Zarada");
-                    Console.WriteLine("---------------------------------------------------------------");
+                    Console.WriteLine("---------------------------------------------------------------------");
                     foreach (var vozilo in TaksiVozila)
                     {
-                        
                         Console.WriteLine(vozilo.ToString());
-                        /*Console.WriteLine($"|{id++}\t\t" +
-                            $"{vozilo.KoordinateVozila.X}\t" +
-                            $"{vozilo.KoordinateVozila.Y}\t\t" +
-                            $"{vozilo.StatusVozila}\t\t" +
-                            $"{vozilo.PredjenaKilometraza}\t\t" +
-                            $"{vozilo.Zarada}");*/
                     }
 
                     Console.WriteLine("\n\t\t\t=== AKTIVNI KLIJENTI ===");
-                    Console.WriteLine("ID\tPocetnaX\tPocetnaY\tKrajnjaX\tKrajnjaY\tStatus");
+                    //Console.WriteLine("ID\tPocetnaX\tPocetnaY\tKrajnjaX\tKrajnjaY\tStatus");
+                    Console.WriteLine("| PocetneX   | PocetneY   | KrajnjeX   | KrajnjeY   | Status     ");
+                    Console.WriteLine("---------------------------------------------------------------------");
                     id = 1;
 
                     foreach (var k in Klijenti)
                     {
-                        Console.WriteLine($"\n{id++}\t\t{k.PocetneKoordinate.X}\t\t" +
-                            $"{k.PocetneKoordinate.Y}\t\t" +
-                            $"{k.KrajnjeKoordinate.X}\t\t" +
-                            $"{k.KrajnjeKoordinate.Y}\t\t" +
-                            $"{k.StatusKlijenta}");
+                        Console.WriteLine(k.ToString());
                     }
                 }
             }
