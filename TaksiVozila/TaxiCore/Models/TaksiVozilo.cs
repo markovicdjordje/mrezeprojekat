@@ -45,12 +45,6 @@ namespace TaxiCore.Models
             }
         }
 
-        public static string Header()
-        {
-            return $@"| {"KoordinateX",-5} | {"KoordinateY",-5} | {"Status",-10} | {"Kilometraza",-5} | {"Zarada",-5}" +
-                   "\n--------------------------------------------------------------------------------------------------------------------";
-        }
-
         public override string ToString()
         {
             return $@"| {KoordinateVozila.X,-11} | {KoordinateVozila.Y,-11} | {StatusVozila,-10} | {PredjenaKilometraza,-11}km | {Zarada,-5}din";

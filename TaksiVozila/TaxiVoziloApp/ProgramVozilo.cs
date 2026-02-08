@@ -11,7 +11,7 @@ namespace TaxiVoziloApp
 {
     class ProgramVozilo
     {
-        private const string SERVER_IP = "127.0.0.1"; // localhost
+        private const string SERVER_IP = "127.0.0.1";
         private const int SERVER_PORT = 5000;
 
         static void Main(string[] args)
@@ -34,21 +34,17 @@ namespace TaxiVoziloApp
                     Console.Write("Unesite Y: ");
                     int y = int.Parse(Console.ReadLine());
 
-                    // Kreiraj TCP konekciju za ovo vozilo
                     TcpClient tcpClient = new TcpClient(SERVER_IP, SERVER_PORT);
                     NetworkStream stream = tcpClient.GetStream();
 
-                    // Pošalji registraciju
                     string registracija = $"{x},{y}";
                     byte[] data = Encoding.UTF8.GetBytes(registracija);
                     stream.Write(data, 0, data.Length);
 
-                    // Čekaj potvrdu
                     byte[] buffer = new byte[1024];
                     int bytesRead = stream.Read(buffer, 0, buffer.Length);
                     Console.WriteLine($"Server: {Encoding.UTF8.GetString(buffer, 0, bytesRead)}");
 
-                    // Pokreni thread za ovo vozilo
                     Thread t = new Thread(() => ObradaVozila(tcpClient, stream, i));
                     t.Start();
                 }

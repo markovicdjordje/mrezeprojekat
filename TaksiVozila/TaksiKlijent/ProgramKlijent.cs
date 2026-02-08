@@ -28,7 +28,6 @@ namespace TaksiKlijent
                     udpClient = new UdpClient();
                     IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(SERVER_IP), SERVER_PORT);
 
-                    // Unos podataka od korisnika
                     Console.Write("Unesite početne koordinate (X) ili 'exit' za kraj: ");
                     string pocetnaTackaX = Console.ReadLine();
                     if (pocetnaTackaX.ToLower() == "exit")
@@ -75,12 +74,9 @@ namespace TaksiKlijent
                         StatusKlijenta = StatusKlijenta.Cekanje
                     };
 
-                    // Kreiraj zahtev
-                    // izmena ovde string zahtev = $"Od: {pocetnaX}:{pocetnaY} -> Do: {krajnjaX}:{krajnjaY}";
                     string zahtev = $"{pocetnaX}:{pocetnaY}:{krajnjaX}:{krajnjaY}";
                     byte[] zahtevBytes = Encoding.UTF8.GetBytes(zahtev);
 
-                    // Pošalji zahtev serveru preko UDP
                     udpClient.Send(zahtevBytes, zahtevBytes.Length, serverEndPoint);
                     Console.WriteLine("\n✓ Zahtev poslat serveru!\n");
 

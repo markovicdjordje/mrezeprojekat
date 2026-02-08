@@ -25,10 +25,6 @@ namespace TaksiServer
         private static List<Zadatak> Zadaci = new List<Zadatak>();
         private static readonly object lockObj = new object();
 
-        //private static int rbTaxi = 0;
-
-        //private static string statusVozila = null;
-
         static void Main(string[] args)
         {
             Console.WriteLine("=== TAKSI SERVER ===");
@@ -52,8 +48,6 @@ namespace TaksiServer
 
             PrihvatiKlijente();
         }
-
-        // TCP - Prihvati povezivanje vozila
         static void PrihvatiVozilo()
         {
             while (true)
@@ -101,7 +95,6 @@ namespace TaksiServer
             }
         }
 
-        // UDP - Prihvati zahteve od klijenata
         static void PrihvatiKlijente()
         {
             IPEndPoint klijentEP = new IPEndPoint(IPAddress.Any, 0);
@@ -222,7 +215,6 @@ namespace TaksiServer
                 //Console.Clear();
                 lock (lockObj)
                 {
-                    int id = 1;
 
                     Console.WriteLine("| KoordinateX | KoordinateY | Status     | Kilometraza | Zarada");
                     Console.WriteLine("---------------------------------------------------------------------");
@@ -235,7 +227,6 @@ namespace TaksiServer
                     //Console.WriteLine("ID\tPocetnaX\tPocetnaY\tKrajnjaX\tKrajnjaY\tStatus");
                     Console.WriteLine("| PocetneX   | PocetneY   | KrajnjeX   | KrajnjeY   | Status     ");
                     Console.WriteLine("---------------------------------------------------------------------");
-                    id = 1;
 
                     foreach (var k in Klijenti)
                     {
@@ -249,12 +240,10 @@ namespace TaksiServer
         {
             lock (lockObj)
             {
-                // Sve čekajuće klijente
                 var cekajuciKlijenti = Klijenti.Where(k => k.StatusKlijenta == StatusKlijenta.Cekanje).ToList();
 
                 foreach (var klijent in cekajuciKlijenti)
                 {
-                    // Sve slobodne vozile
                     var slobodnaVozila = TaksiVozila
                         .Where(v => v.StatusVozila == StatusVozila.Slobodno && v.Stream != null)
                         .ToList();
@@ -262,7 +251,6 @@ namespace TaksiServer
                     if (slobodnaVozila.Count == 0)
                         break;
 
-                    // Izaberi najbliže slobodno vozilo
                     var najblizeVozilo = slobodnaVozila
                         .OrderBy(v => v.KoordinateVozila.Distanca(klijent.PocetneKoordinate))
                         .First();
@@ -277,9 +265,6 @@ namespace TaksiServer
 
                     Zadaci.Add(zadatak);
 
-
-
-                    // Dodeli klijenta
                     najblizeVozilo.StatusVozila = StatusVozila.Odlazak_Na_Lokaciju;
                     klijent.StatusKlijenta = StatusKlijenta.Prihvaceno;
 
@@ -295,7 +280,6 @@ namespace TaksiServer
                     $"({klijent.KrajnjeKoordinate.X},{klijent.KrajnjeKoordinate.Y})"
 );
 
-                    // Ukloni vozilo iz liste slobodnih da ne bi dodeljeno više puta
                     slobodnaVozila.Remove(najblizeVozilo);
                 }
             }
