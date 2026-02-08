@@ -48,7 +48,7 @@ namespace TaxiVoziloApp
                     return;
                 }
 
-                string registracija = $"{pocetnaX}, {pocetnaY},{StatusVozila.Slobodno}";
+                string registracija = $"{pocetnaX}, {pocetnaY}, {StatusVozila.Slobodno}";
                 Posalji(registracija);
 
                 string potvrda = Procitaj();
