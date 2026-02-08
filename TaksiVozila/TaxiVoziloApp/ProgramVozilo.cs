@@ -58,7 +58,13 @@ namespace TaxiVoziloApp
                 while (true)
                 {
                     string poruka = Procitaj();
-                    if (poruka == null) break;
+                    //if (poruka == null) break;
+
+                    if (poruka == null)
+                    {
+                        Thread.Sleep(100);
+                        continue;
+                    }
 
                     if (!poruka.StartsWith("NOVI_ZADATAK"))
                         continue;
@@ -75,48 +81,6 @@ namespace TaxiVoziloApp
 
                     Console.WriteLine("Voznja zavrsena\n");
                 }
-
-                /*TaksiVozilo taksi = new TaksiVozilo
-                {
-                    KoordinateVozila = new Koordinate(pocetnaX, pocetnaY),
-                    StatusVozila = StatusVozila.Slobodno
-                };
-                taksi.TcpClient = tcpClient;
-                taksi.Stream = stream;
-
-                string podaciVozila = $"{pocetnaX},{pocetnaY},{StatusVozila.Slobodno}";
-                byte[] podatciBytes = Encoding.UTF8.GetBytes(podaciVozila);
-                stream.Write(podatciBytes, 0, podatciBytes.Length);
-                //stream.Write(taksi.Serialize());
-                Console.WriteLine("\n✓ Podaci poslati serveru!\n");
-
-                byte[] buffer = new byte[1024];
-                int bytesRead = stream.Read(buffer, 0, buffer.Length);
-                string potvrda = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                Console.WriteLine($"Server: {potvrda}\n");
-
-                Console.WriteLine("Cekam zadatke od servera...\n");
-
-                while (true)
-                {
-                    //bytesRead = stream.Read
-                    if (bytesRead == 0) break;
-
-                    string poruka = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                    Console.WriteLine($"[ZADATAK {poruka}]");
-
-                    Console.WriteLine("->Krecem ka klijentu...");
-                    Thread.Sleep(3000);
-                    Posalji("STIGAO_PO_KLIJENTA");
-
-                    // Simulacija vožnje
-                    Console.WriteLine("→ Vozim klijenta...");
-                    Thread.Sleep(5000);
-                    Posalji("VOZNJA_ZAVRSENA");
-
-                    Console.WriteLine("✓ Vožnja završena\n");
-                }*/
-               
             }
             catch (Exception ex)
             {

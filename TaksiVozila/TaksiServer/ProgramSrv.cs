@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TaxiCore.Models;
 using TaxiCore.Enums;
+using System.IO;
 
 namespace TaksiServer
 {
@@ -46,9 +47,7 @@ namespace TaksiServer
             Thread visuelizacijaThread = new Thread(VizuelizacijaLoop);
             visuelizacijaThread.Start();
 
-            // Glavna petlja za UDP zahteve od klijenata
             PrihvatiKlijente();
-
         }
 
         // TCP - Prihvati povezivanje vozila
@@ -63,6 +62,7 @@ namespace TaksiServer
                     byte[] buffer = new byte[1024];
                     int bytesRead = stream.Read(buffer, 0, buffer.Length);
                     string podaciVozila = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+
                     var delovi = podaciVozila.Split(',');
                     int x = int.Parse(delovi[0]);
                     int y = int.Parse(delovi[1]);
@@ -80,6 +80,21 @@ namespace TaksiServer
                     lock (lockObj)
                     {
                         TaksiVozila.Add(taksiVozilo);
+
+                        // provera da li postoji klijent koji vec ceka:
+
+                        var cekajuciKlijent = Klijenti.FirstOrDefault(k => k.StatusKlijenta == StatusKlijenta.Cekanje);
+
+                        if (cekajuciKlijent != null)
+                        {
+                            taksiVozilo.StatusVozila = StatusVozila.Odlazak_Na_Lokaciju;
+                            cekajuciKlijent.StatusKlijenta = StatusKlijenta.Prihvaceno;
+
+                            string zadatak = $"NOVI_ZADATAK:{cekajuciKlijent.PocetneKoordinate.X}:{cekajuciKlijent.PocetneKoordinate.Y}:{cekajuciKlijent.KrajnjeKoordinate.X}:{cekajuciKlijent.KrajnjeKoordinate.Y}";
+                            byte[] zadatakBytes = Encoding.UTF8.GetBytes(zadatak);
+                            taksiVozilo.Stream.Write(zadatakBytes, 0, zadatakBytes.Length);
+                            Console.WriteLine("[SERVER] Dodeljen zadatak čekajućem klijentu nakon registracije vozila.");
+                        }
                     }
 
                     Console.Write($"[TCP] Novo vozilo se povezalo: {podaciVozila}");
@@ -87,6 +102,7 @@ namespace TaksiServer
                     string potvrda = "Server: Vozilo registrovano";
                     byte[] potvrdaBytes = Encoding.UTF8.GetBytes(potvrda);
                     stream.Write(potvrdaBytes, 0, potvrdaBytes.Length);
+
                     new Thread(() => ObradaVozila(taksiVozilo)).Start();
                 }
                 catch (Exception ex)
@@ -135,8 +151,10 @@ namespace TaksiServer
                     {
                         Klijenti.Add(klijent);
 
-                        slobodnoVozilo = TaksiVozila.FirstOrDefault(v => v.StatusVozila == StatusVozila.Slobodno &&
-                        v.Stream != null);
+                        //slobodnoVozilo = TaksiVozila.FirstOrDefault(v => v.StatusVozila == StatusVozila.Slobodno && v.Stream != null);
+
+                        // bira najblize vozilo 
+                        slobodnoVozilo = TaksiVozila.Where(v => v.StatusVozila == StatusVozila.Slobodno && v.Stream != null).OrderBy(v => v.KoordinateVozila.Distanca(klijent.PocetneKoordinate)).FirstOrDefault();
 
                         if (slobodnoVozilo != null)
                         {
@@ -159,7 +177,7 @@ namespace TaksiServer
                     }
                     else
                     {
-                        // 4. AKO NEMA SLOBODNIH VOZILA
+                        // AKO NEMA SLOBODNIH VOZILA
                         string odgovor = "Server: Trenutno nema slobodnih vozila.";
                         byte[] odgovorBytes = Encoding.UTF8.GetBytes(odgovor);
                         udpClient.Send(odgovorBytes, odgovorBytes.Length, klijentEP);
@@ -220,11 +238,11 @@ namespace TaksiServer
             while (true)
             {
                 Console.WriteLine("\n-------------------------------------------------\n");
-                Thread.Sleep(2000);
+                Thread.Sleep(5000);
                 //Console.Clear();
                 lock (lockObj)
                 {
-                    Console.WriteLine("=== STATUS VOZILA ===");
+                    Console.WriteLine("\n=== STATUS VOZILA ===");
                     Console.WriteLine("ID\tPozicijaX\tPozicijaY\tStatus\tKm\tZarada");
                     int id = 1;
                     foreach (var vozilo in TaksiVozila)
