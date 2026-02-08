@@ -102,7 +102,7 @@ namespace TaksiServer
                     }
                     DodeliZadatke();
 
-                    Console.Write($"[TCP] Novo vozilo se povezalo: {podaciVozila}");
+                    Console.Write($"[TCP] Novo vozilo se povezalo: {podaciVozila}\n");
 
                     string potvrda = "Server: Vozilo registrovano";
                     byte[] potvrdaBytes = Encoding.UTF8.GetBytes(potvrda);
@@ -128,7 +128,7 @@ namespace TaksiServer
                     byte[] primljeniPodaci = udpClient.Receive(ref klijentEP);
                     string zahtev = Encoding.UTF8.GetString(primljeniPodaci);
 
-                    Console.WriteLine($"[UDP] Zahtev od klijenta {klijentEP}: {zahtev}");
+                    Console.WriteLine($"[UDP] Zahtev od klijenta {klijentEP}: {zahtev}\n");
 
                     var delovi = zahtev.Split(':');
 
@@ -272,7 +272,7 @@ namespace TaksiServer
                 //Console.Clear();
                 lock (lockObj)
                 {
-                    Console.WriteLine("\n=== STATUS VOZILA ===");
+                    Console.WriteLine("\n\t\t\t=== STATUS VOZILA ===");
                     Console.WriteLine("ID\tPozicijaX\tPozicijaY\tStatus\t\tKm\t\tZarada");
                     int id = 1;
                     foreach (var vozilo in TaksiVozila)
@@ -285,7 +285,7 @@ namespace TaksiServer
                             $"{vozilo.Zarada}");
                     }
 
-                    Console.WriteLine("\n=== AKTIVNI KLIJENTI ===");
+                    Console.WriteLine("\n\t\t\t=== AKTIVNI KLIJENTI ===");
                     Console.WriteLine("ID\tPocetnaX\tPocetnaY\tKrajnjaX\tKrajnjaY\tStatus");
                     id = 1;
 
