@@ -49,7 +49,5 @@ namespace TaxiCore.Models
         {
             return $@"| {KoordinateVozila.X,-11} | {KoordinateVozila.Y,-11} | {StatusVozila,-10} | {PredjenaKilometraza,-11}km | {Zarada,-5}din";
         }
-
-
     }
 }

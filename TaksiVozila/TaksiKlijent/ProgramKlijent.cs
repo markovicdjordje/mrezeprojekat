@@ -13,7 +13,7 @@ namespace TaksiKlijent
     class ProgramKlijent
     {
         private static UdpClient udpClient;
-        private const string SERVER_IP = "127.0.0.1"; // localhost
+        private const string SERVER_IP = "127.0.0.1";
         private const int SERVER_PORT = 5001;
 
         static void Main(string[] args)

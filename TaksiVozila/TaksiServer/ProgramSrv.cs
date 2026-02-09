@@ -30,16 +30,15 @@ namespace TaksiServer
             Console.WriteLine("=== TAKSI SERVER ===");
             Console.WriteLine("Pokretanje servera...\n");
 
-            // Pokreni TCP listener za vozila
+            // tcp listener za vozila
             tcpListener = new TcpListener(IPAddress.Any, TCP_PORT);
             tcpListener.Start();
             Console.WriteLine($"[TCP] Server pokrenut na portu {TCP_PORT} - čeka vozila...");
 
-            // Pokreni UDP soket za klijente
+            // udp soket za klijente
             udpClient = new UdpClient(UDP_PORT);
             Console.WriteLine($"[UDP] Server pokrenut na portu {UDP_PORT} - čeka klijente...\n");
 
-            // Pokreni thread za prihvatanje vozila
             Thread tcpThread = new Thread(PrihvatiVozilo);
             tcpThread.Start();
 
